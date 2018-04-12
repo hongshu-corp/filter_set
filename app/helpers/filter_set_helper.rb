@@ -1,5 +1,5 @@
 module FilterSetHelper
   def test_render
-    render '/hello_world'
+    render 'filter_set/hello_world'
   end
 end
