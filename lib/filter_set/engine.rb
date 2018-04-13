@@ -5,5 +5,9 @@ module FilterSet
       g.assets false
       g.helper false
     end
+
+    initializer "FilterSetEngine.include_concern" do |app|
+      ActionController::Base.send :include, ::FilterSetConcern
+    end
   end
 end
