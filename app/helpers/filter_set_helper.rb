@@ -1,8 +1,4 @@
 module FilterSetHelper
-  def test_render
-    render 'filter_set/hello_world'
-  end
-
   class DefaultFilterBuilder
     def initialize builder, helper
       @builder = builder
@@ -16,7 +12,7 @@ module FilterSetHelper
     def by name, options={}
       filter_class = "filter-by-#{name}"
       filter_class += " filter-by-#{options[:key]}" if(options[:key])
-      @helper.render "filter_set/#{name}", filter_builder: self, key: (options[:key]||name), clazz: filter_class, options: options
+      @helper.render "filter_set/#{name}", builder: @builder, key: (options[:key]||name), clazz: filter_class, options: options
     end
   end
 

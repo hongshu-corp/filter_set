@@ -6,7 +6,7 @@ class DemoController < ApplicationController
   end
 
   def index
-    @selected_conditions = filter_conditions key: @@key
+    @selected_conditions = filter_conditions @@key
   end
 end
 
