@@ -13,3 +13,6 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+gem "rspec-rails"
+gem "capybara-rails"
+gem "rspec-html-matchers"

@@ -4,8 +4,5 @@ module FilterSetConcern
   def filter_conditions options={}
     OpenStruct.new(params[options[:key]||:filter_conditions].as_json)
   end
-
-  included do
-  end
 end
 

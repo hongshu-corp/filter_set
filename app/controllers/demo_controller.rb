@@ -1,4 +1,6 @@
 class DemoController < ApplicationController
+  @@key = nil
+
   def self.key= value
     @@key = value
   end
@@ -7,3 +9,4 @@ class DemoController < ApplicationController
     @selected_conditions = filter_conditions key: @@key
   end
 end
+
