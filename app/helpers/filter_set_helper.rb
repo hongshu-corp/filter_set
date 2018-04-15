@@ -5,18 +5,30 @@ module FilterSetHelper
       @helper = helper 
     end
 
-    def builder
-      @builder
+    def by name, options={}
+      key = options.delete :key
+      caption = options.delete(:caption) || @helper.t("filter_set.captions.#{name}")
+      filter_class = "by-#{name}"
+      caption_class = "caption caption-#{name}"
+      if key
+        filter_class += " by-#{key}"
+        caption_class += " caption-#{key}"
+      end
+      options[:class] = filter_class
+      @helper.render "filter_set/#{name}", builder: self, key: (key||name), caption: caption, caption_class: caption_class, options: options
     end
 
-    def by name, options={}
-      filter_class = "filter-by-#{name}"
-      filter_class += " filter-by-#{options[:key]}" if(options[:key])
-      @helper.render "filter_set/#{name}", builder: @builder, key: (options[:key]||name), clazz: filter_class, options: options
+    def caption text, clazz: nil
+      @helper.render "filter_set/caption", text: text, clazz: clazz
+    end
+
+    def method_missing(m, *args, &block)
+      @builder.send(m, *args, &block)
     end
   end
 
   def filter_set options={}, &block
+    stylesheet_link_tag('filter_set/filter_set') +
     form_for(controller.filter_conditions(options[:key]), as: (options[:key]||:filter_conditions), url: request.path, html: {class: options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
       block.call DefaultFilterBuilder.new(f, self) if block
     end

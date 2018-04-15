@@ -6,8 +6,12 @@ module FilterSet
       g.helper false
     end
 
-    initializer "FilterSetEngine.include_concern" do |app|
+    initializer "filter_set.include_concern" do |app|
       ActionController::Base.send :include, ::FilterSetConcern
+    end
+
+    initializer "filter_set.assets.precompile" do |app|
+      app.config.assets.precompile += %w(filter_set/filter_set.css)
     end
   end
 end

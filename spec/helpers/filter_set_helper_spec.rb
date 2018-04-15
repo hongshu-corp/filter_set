@@ -6,6 +6,7 @@ describe FilterSetHelper, type: :helper do
   before do
     allow(helper).to receive(:request).and_return double('request', path: request_path)
     allow(helper).to receive(:controller).and_return double('controller', { filter_conditions: OpenStruct.new })
+    allow(helper).to receive(:stylesheet_link_tag).and_return ''
   end
 
   describe 'render search form' do
@@ -21,13 +22,27 @@ describe FilterSetHelper, type: :helper do
   describe 'render text field' do
     let(:form_args) { [request_path, :get] }
 
-    it 'render text field by default key with no value' do
-      expect(helper.filter_set do |fs|
-        fs.by :text
-      end).to have_form(*form_args) do
-        with_tag 'input', with: {name: 'filter_conditions[text]', type: 'text', class: 'filter-by-text'}
+    context 'default key with no value' do
+      subject do
+        helper.filter_set do |fs|
+          fs.by :text
+        end
+      end
+
+      it 'render text field by default key with no value' do
+        expect(subject).to have_form(*form_args) do
+          with_tag 'input', with: {name: 'filter_conditions[text]', type: 'text', class: 'by-text'}
+        end
+      end
+
+      it 'render text field by default key with no value' do
+        expect(helper).to receive(:t).with('filter_set.captions.text').and_return('I18nText')
+        expect(subject).to have_form(*form_args) do
+          with_tag 'label', text: 'I18nText'
+        end
       end
     end
+
 
     let(:new_condition_key) { :new_cond }
     let(:new_text_key) { :new_text }
@@ -37,9 +52,10 @@ describe FilterSetHelper, type: :helper do
       expect(controller).to receive(:filter_conditions).with(new_condition_key).and_return(OpenStruct.new new_text_key => 'hello')
 
       expect(helper.filter_set(key: new_condition_key) do |fs|
-        fs.by :text, key: new_text_key
+        fs.by :text, key: new_text_key, caption: 'KEY_WORD', placeholder: 'Key word'
       end).to have_form(*form_args) do
-        with_tag 'input', with: {name: "#{new_condition_key}[#{new_text_key}]", type: 'text', value: 'hello', class: "filter-by-text filter-by-#{new_text_key}"}
+        with_tag 'label', text: 'KEY_WORD', with: {class: "caption caption-text caption-#{new_text_key}"}
+        with_tag 'input', with: {name: "#{new_condition_key}[#{new_text_key}]", type: 'text', value: 'hello', class: "by-text by-#{new_text_key}", placeholder: 'Key word'}
       end
     end
   end
