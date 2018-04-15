@@ -13,6 +13,15 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
-gem "rspec-rails"
-gem "capybara-rails"
-gem "rspec-html-matchers"
+gem "rails", "~> 4.2.10"
+gem "slim-rails"
+gem "sass-rails"
+
+group :test do
+  gem "sqlite3"
+  gem "rspec-rails"
+  gem "rspec-html-matchers"
+  gem "capybara-rails"
+  gem "capybara-screenshot"
+end
+

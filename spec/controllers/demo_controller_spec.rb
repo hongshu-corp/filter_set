@@ -28,12 +28,14 @@ RSpec.describe DemoController, type: :controller do
   end
 
   context 'e2e' do
+    render_views
+
     it 'filter by text' do
       visit '/demo'
       fill_in 'Key word', with: 'Hello'
       click_link_or_button 'Go'
 
-      expect(page).to have_content({condition: {by_text: 'Hello'}}.to_json);
+      expect(page).to have_content({by_text: 'Hello'}.to_json);
     end
   end
 end

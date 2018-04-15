@@ -1,5 +1,6 @@
 = filter_set key: 'condition' do |filter|
   = filter.by :text, key: 'by_text', placeholder: 'Key word'
-  /*= filter.text*/
-  /*= filter.search GO*/
+  = filter.submit :search, caption: 'Go'
+
+= controller.filter_conditions('condition').to_h.to_json
 

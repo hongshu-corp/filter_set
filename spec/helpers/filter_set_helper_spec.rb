@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe FilterSetHelper, type: :helper do
   let(:request_path) { '/some-path' }
+  let(:form_args) { [request_path, :get] }
 
   before do
     allow(helper).to receive(:request).and_return double('request', path: request_path)
@@ -11,7 +12,7 @@ describe FilterSetHelper, type: :helper do
 
   describe 'render search form' do
     it 'render an empty form with default args' do
-      expect(helper.filter_set).to have_form(request_path, :get, with: {'class': 'filter-set'})
+      expect(helper.filter_set).to have_form(*form_args, with: {'class': 'filter-set'})
     end
 
     it 'render with form args' do
@@ -20,8 +21,6 @@ describe FilterSetHelper, type: :helper do
   end
 
   describe 'render text field' do
-    let(:form_args) { [request_path, :get] }
-
     context 'default key with no value' do
       subject do
         helper.filter_set do |fs|
@@ -29,33 +28,91 @@ describe FilterSetHelper, type: :helper do
         end
       end
 
-      it 'render text field by default key with no value' do
+      it 'render text field' do
         expect(subject).to have_form(*form_args) do
           with_tag 'input', with: {name: 'filter_conditions[text]', type: 'text', class: 'by-text'}
         end
       end
 
-      it 'render text field by default key with no value' do
+      it 'render text caption' do
         expect(helper).to receive(:t).with('filter_set.captions.text').and_return('I18nText')
+
         expect(subject).to have_form(*form_args) do
           with_tag 'label', text: 'I18nText'
         end
       end
     end
 
+    context 'new key' do
+      let(:new_condition_key) { :new_cond }
+      let(:new_text_key) { :new_text }
+      it 'render text with new key' do
+        expect(helper).to receive(:t).with("filter_set.captions.#{new_text_key}", any_args).and_return('I18nText')
 
-    let(:new_condition_key) { :new_cond }
-    let(:new_text_key) { :new_text }
-    it 'render text field by args in key, value and conditions name' do
-      controller = double 'controller'
-      allow(helper).to receive(:controller).and_return controller
-      expect(controller).to receive(:filter_conditions).with(new_condition_key).and_return(OpenStruct.new new_text_key => 'hello')
+        expect(helper.filter_set do |fs|
+          fs.by :text, key: new_text_key
+        end).to have_form(*form_args) do
+          with_tag 'label', text: 'I18nText'
+        end
+      end
 
-      expect(helper.filter_set(key: new_condition_key) do |fs|
-        fs.by :text, key: new_text_key, caption: 'KEY_WORD', placeholder: 'Key word'
-      end).to have_form(*form_args) do
-        with_tag 'label', text: 'KEY_WORD', with: {class: "caption caption-text caption-#{new_text_key}"}
-        with_tag 'input', with: {name: "#{new_condition_key}[#{new_text_key}]", type: 'text', value: 'hello', class: "by-text by-#{new_text_key}", placeholder: 'Key word'}
+      it 'render text with new key but default i18n' do
+        expect(helper).to receive(:t).with("filter_set.captions.#{new_text_key}", any_args).and_return(nil)
+        expect(helper).to receive(:t).with('filter_set.captions.text').and_return('I18nText')
+
+        expect(helper.filter_set do |fs|
+          fs.by :text, key: new_text_key
+        end).to have_form(*form_args) do
+          with_tag 'label', text: 'I18nText'
+        end
+      end
+
+      it 'render text field by args in key, value and conditions name' do
+        controller = double 'controller'
+        allow(helper).to receive(:controller).and_return controller
+        expect(controller).to receive(:filter_conditions).with(new_condition_key).and_return(OpenStruct.new new_text_key => 'hello')
+
+        expect(helper.filter_set(key: new_condition_key) do |fs|
+          fs.by :text, key: new_text_key, caption: 'KEY_WORD', placeholder: 'Key word'
+        end).to have_form(*form_args) do
+          with_tag 'label', text: 'KEY_WORD', with: {'class': "caption caption-text caption-#{new_text_key}"}
+          with_tag 'input', with: {name: "#{new_condition_key}[#{new_text_key}]", type: 'text', value: 'hello', class: "by-text by-#{new_text_key}", placeholder: 'Key word'}
+        end
+      end
+    end
+  end
+
+  describe 'render search submit' do
+    it 'default search button' do
+      expect(helper).to receive(:t).with('filter_set.submits.search').and_return('I18nSearch')
+
+      expect(helper.filter_set{|fs| fs.submit :search}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search}.to_json}", class: 'submit submit-search'}, text: 'I18nSearch'
+      end
+    end
+
+    it 'search with scope' do
+      expect(helper).to receive(:t).with('filter_set.submits.search.order', any_args).and_return('I18nSearch')
+
+      expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'
+      end
+    end
+
+    it 'search with scope and default i18n' do
+      expect(helper).to receive(:t).with('filter_set.submits.search.order', any_args).and_return(nil)
+      expect(helper).to receive(:t).with('filter_set.submits.search').and_return('I18nSearch')
+
+      expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'
+      end
+    end
+
+    it 'search with scope and caption' do
+      expect(helper).not_to receive(:t)
+
+      expect(helper.filter_set{|fs| fs.submit :search, scope: :order, caption: 'GO'}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'GO'
       end
     end
   end
