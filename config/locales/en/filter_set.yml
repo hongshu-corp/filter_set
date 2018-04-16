@@ -1,4 +1,6 @@
 en:
   filter_set:
-    captions:
+    by:
       text: Text
+    submit:
+      search: Search

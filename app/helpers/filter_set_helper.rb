@@ -13,9 +13,9 @@ module FilterSetHelper
       if key
         filter_class += " by-#{key}"
         caption_class += " caption-#{key}"
-        caption ||= @helper.t("filter_set.captions.#{key}", default: nil)
+        caption ||= @helper.t("filter_set.by.#{key}", default: nil)
       end
-      caption ||= @helper.t("filter_set.captions.#{filter}")
+      caption ||= @helper.t("filter_set.by.#{filter}")
       options[:class] = filter_class
       @helper.render "filter_set/by/#{filter}", builder: self, key: (key||filter), caption: caption, caption_class: caption_class, options: options
     end
@@ -33,12 +33,12 @@ module FilterSetHelper
       caption = options.delete :caption
       if scope
         submit_value.merge! scope: scope
-        caption ||= @helper.t("filter_set.submits.search.#{scope}", default: nil)
+        caption ||= @helper.t("filter_set.submit.search.#{scope}", default: nil)
         options[:class] += " submit-#{type}-#{scope}"
       end
       options[:value] = submit_value.to_json
       @helper.render layout: "filter_set/submit/#{type}", locals: {options: options} do
-        (caption || @helper.t('filter_set.submits.search')).html_safe
+        (caption || @helper.t('filter_set.submit.search')).html_safe
       end
     end
 

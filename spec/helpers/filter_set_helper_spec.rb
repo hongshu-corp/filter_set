@@ -35,7 +35,7 @@ describe FilterSetHelper, type: :helper do
       end
 
       it 'render text caption' do
-        expect(helper).to receive(:t).with('filter_set.captions.text').and_return('I18nText')
+        expect(helper).to receive(:t).with('filter_set.by.text').and_return('I18nText')
 
         expect(subject).to have_form(*form_args) do
           with_tag 'label', text: 'I18nText'
@@ -47,7 +47,7 @@ describe FilterSetHelper, type: :helper do
       let(:new_condition_key) { :new_cond }
       let(:new_text_key) { :new_text }
       it 'render text with new key' do
-        expect(helper).to receive(:t).with("filter_set.captions.#{new_text_key}", any_args).and_return('I18nText')
+        expect(helper).to receive(:t).with("filter_set.by.#{new_text_key}", any_args).and_return('I18nText')
 
         expect(helper.filter_set do |fs|
           fs.by :text, key: new_text_key
@@ -57,8 +57,8 @@ describe FilterSetHelper, type: :helper do
       end
 
       it 'render text with new key but default i18n' do
-        expect(helper).to receive(:t).with("filter_set.captions.#{new_text_key}", any_args).and_return(nil)
-        expect(helper).to receive(:t).with('filter_set.captions.text').and_return('I18nText')
+        expect(helper).to receive(:t).with("filter_set.by.#{new_text_key}", any_args).and_return(nil)
+        expect(helper).to receive(:t).with('filter_set.by.text').and_return('I18nText')
 
         expect(helper.filter_set do |fs|
           fs.by :text, key: new_text_key
@@ -84,7 +84,7 @@ describe FilterSetHelper, type: :helper do
 
   describe 'render search submit' do
     it 'default search button' do
-      expect(helper).to receive(:t).with('filter_set.submits.search').and_return('I18nSearch')
+      expect(helper).to receive(:t).with('filter_set.submit.search').and_return('I18nSearch')
 
       expect(helper.filter_set{|fs| fs.submit :search}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search}.to_json}", class: 'submit submit-search'}, text: 'I18nSearch'
@@ -92,7 +92,7 @@ describe FilterSetHelper, type: :helper do
     end
 
     it 'search with scope' do
-      expect(helper).to receive(:t).with('filter_set.submits.search.order', any_args).and_return('I18nSearch')
+      expect(helper).to receive(:t).with('filter_set.submit.search.order', any_args).and_return('I18nSearch')
 
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'
@@ -100,8 +100,8 @@ describe FilterSetHelper, type: :helper do
     end
 
     it 'search with scope and default i18n' do
-      expect(helper).to receive(:t).with('filter_set.submits.search.order', any_args).and_return(nil)
-      expect(helper).to receive(:t).with('filter_set.submits.search').and_return('I18nSearch')
+      expect(helper).to receive(:t).with('filter_set.submit.search.order', any_args).and_return(nil)
+      expect(helper).to receive(:t).with('filter_set.submit.search').and_return('I18nSearch')
 
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'

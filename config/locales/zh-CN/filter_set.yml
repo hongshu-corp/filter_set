@@ -1,4 +1,6 @@
 zh-CN:
   filter_set:
-    captions:
+    by:
       text: 文本
+    submit:
+      search: 搜索
