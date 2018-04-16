@@ -49,7 +49,7 @@ module FilterSetHelper
 
   def filter_set options={}, &block
     stylesheet_link_tag('filter_set/filter_set') +
-    form_for(controller.filter_conditions(options[:key]), as: (options[:key]||:filter_conditions), url: request.path, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
+    form_for(controller.filter_conditions(options[:key]), as: (options[:key]||Rails.configuration.filter_set_key), url: request.path, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
       block.call DefaultFilterBuilder.new(f, self) if block
     end
   end

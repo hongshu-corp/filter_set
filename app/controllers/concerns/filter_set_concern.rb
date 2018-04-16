@@ -2,7 +2,7 @@ module FilterSetConcern
   extend ActiveSupport::Concern
 
   def filter_conditions key=nil
-    OpenStruct.new((params[key||:filter_conditions] || {}).as_json)
+    OpenStruct.new((params[key||Rails.configuration.filter_set_key] || {}).as_json)
   end
 
   def filter_action

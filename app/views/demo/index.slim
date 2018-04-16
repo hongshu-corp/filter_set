@@ -6,6 +6,6 @@
   = filter.by :text
   = filter.submit :search
 
-p = controller.filter_conditions.to_h.to_json
+p = controller.filter_conditions(:condition).to_h.to_json
 p = controller.filter_action.to_h.to_json
 

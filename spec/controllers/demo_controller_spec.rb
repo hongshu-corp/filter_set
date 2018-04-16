@@ -39,6 +39,7 @@ RSpec.describe DemoController, type: :controller do
     render_views
 
     it 'filter by text' do
+      I18n.default_locale = :en
       visit '/demo'
       fill_in 'Key word', with: 'Hello'
       click_link_or_button 'Go'

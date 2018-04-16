@@ -11,6 +11,8 @@ module FilterSet
       app.config.assets.precompile += %w(filter_set/filter_set.css)
       app.config.i18n.load_path += Dir[Engine.root.join('config', 'locales','**', '*.{rb,yml}').to_s]
       app.config.i18n.default_locale = :"zh-CN"
+
+      app.config.filter_set_key = :filter_conditions
     end
   end
 end
