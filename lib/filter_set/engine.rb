@@ -6,12 +6,11 @@ module FilterSet
       g.helper false
     end
 
-    initializer "filter_set.include_concern" do |app|
+    initializer "filter_set.init" do |app|
       ActionController::Base.send :include, ::FilterSetConcern
-    end
-
-    initializer "filter_set.assets.precompile" do |app|
       app.config.assets.precompile += %w(filter_set/filter_set.css)
+      app.config.i18n.load_path += Dir[Engine.root.join('config', 'locales','**', '*.{rb,yml}').to_s]
+      app.config.i18n.default_locale = :"zh-CN"
     end
   end
 end

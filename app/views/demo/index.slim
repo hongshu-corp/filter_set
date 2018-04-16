@@ -2,5 +2,10 @@
   = filter.by :text, key: 'by_text', placeholder: 'Key word'
   = filter.submit :search, caption: 'Go'
 
-= controller.filter_conditions('condition').to_h.to_json
+= filter_set do |filter|
+  = filter.by :text
+  = filter.submit :search
+
+p = controller.filter_conditions.to_h.to_json
+p = controller.filter_action.to_h.to_json
 

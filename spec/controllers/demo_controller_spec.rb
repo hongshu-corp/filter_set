@@ -27,6 +27,14 @@ RSpec.describe DemoController, type: :controller do
     end
   end
 
+  describe 'get submit type' do
+    it 'action type with no scope' do
+      get :index, {submit: {type: :search}.to_json}
+
+      expect(assigns(:filter_action)).to eq (OpenStruct.new(type: 'search'))
+    end
+  end
+
   context 'e2e' do
     render_views
 
