@@ -16,6 +16,8 @@ gemspec
 gem "rails", "~> 4.2.10"
 gem "slim-rails"
 gem "sass-rails"
+gem "nokogiri"
+gem "rubyXL"
 
 group :test do
   gem "sqlite3"

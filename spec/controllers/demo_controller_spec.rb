@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'csv'
 
 RSpec.describe DemoController, type: :controller do
   describe 'get conditions object in controller' do
@@ -32,6 +33,26 @@ RSpec.describe DemoController, type: :controller do
       get :index, {submit: {type: :search}.to_json}
 
       expect(assigns(:filter_action)).to eq (OpenStruct.new(type: 'search'))
+    end
+  end
+
+  describe 'export with csv' do
+    render_views
+
+    let(:csv) do
+      CSV.generate do |csv|
+        csv << ['a', 'b']
+        csv << ['c', 'd']
+      end
+    end
+
+    let(:filename) { 'csv' }
+
+    it 'export data' do
+      allow(controller).to receive(:export_filename_pattern).and_return(filename)
+      expect(controller).to receive(:send_data).with(csv.force_encoding('binary'), type: 'text/csv', filename: filename+'.csv')
+
+      get :index, {submit: {type: :export, format: :csv}.to_json}
     end
   end
 

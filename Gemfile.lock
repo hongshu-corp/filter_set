@@ -143,6 +143,10 @@ GEM
       rspec-mocks (~> 3.7.0)
       rspec-support (~> 3.7.0)
     rspec-support (3.7.1)
+    rubyXL (3.3.29)
+      nokogiri (>= 1.4.4)
+      rubyzip (>= 1.1.6)
+    rubyzip (1.2.1)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -185,9 +189,11 @@ DEPENDENCIES
   capybara-rails
   capybara-screenshot
   filter_set!
+  nokogiri
   rails (~> 4.2.10)
   rspec-html-matchers
   rspec-rails
+  rubyXL
   sass-rails
   slim-rails
   sqlite3
