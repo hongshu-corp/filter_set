@@ -5,6 +5,7 @@
 = filter_set do |filter|
   = filter.by :text
   = filter.submit :search
+  = filter.submit :export
 
 p = controller.filter_conditions(:condition).to_h.to_json
 p = controller.filter_action.to_h.to_json

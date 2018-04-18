@@ -84,35 +84,46 @@ describe FilterSetHelper, type: :helper do
 
   describe 'render search submit' do
     it 'default search button' do
-      expect(helper).to receive(:t).with('filter_set.submit.search').and_return('I18nSearch')
+      expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: '').and_return('I18nSearch')
 
       expect(helper.filter_set{|fs| fs.submit :search}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search}.to_json}", class: 'submit submit-search'}, text: 'I18nSearch'
       end
     end
 
-    it 'search with scope' do
-      expect(helper).to receive(:t).with('filter_set.submit.search.order', any_args).and_return('I18nSearch')
-
-      expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'
-      end
-    end
-
     it 'search with scope and default i18n' do
-      expect(helper).to receive(:t).with('filter_set.submit.search.order', any_args).and_return(nil)
-      expect(helper).to receive(:t).with('filter_set.submit.search').and_return('I18nSearch')
+      expect(helper).to receive(:t).with('filter_set.submit.search.scopes.order', default: '').and_return('I18nOrder')
+      expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: 'I18nOrder').and_return('I18nSearchOrder')
 
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearch'
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearchOrder'
       end
     end
 
     it 'search with scope and caption' do
-      expect(helper).not_to receive(:t)
-
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order, caption: 'GO'}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'GO'
+      end
+    end
+  end
+
+  describe 'render export' do
+    it 'default export csv button' do
+      expect(helper).to receive(:t).with('filter_set.submit.export.formats.csv', default: '').and_return('I18nCSV')
+      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: '', _format: 'I18nCSV').and_return('I18nExport')
+
+      expect(helper.filter_set{|fs| fs.submit :export}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :export, format: :csv}.to_json}", class: 'submit submit-export submit-export-csv'}, text: 'I18nExport'
+      end
+    end
+
+    it 'export with args' do
+      expect(helper).to receive(:t).with('filter_set.submit.export.formats.excel', default: '').and_return('I18nEXCEL')
+      expect(helper).to receive(:t).with('filter_set.submit.export.scopes.pagging', default: '').and_return('I18nPaging')
+      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: 'I18nPaging', _format: 'I18nEXCEL').and_return('I18nExport')
+
+      expect(helper.filter_set{|fs| fs.submit :export, format: :excel, scope: 'pagging'}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :export, scope: 'pagging', format: :excel}.to_json}", class: 'submit submit-export submit-export-excel submit-export-pagging'}, text: 'I18nExport'
       end
     end
   end

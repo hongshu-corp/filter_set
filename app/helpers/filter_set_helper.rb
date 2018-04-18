@@ -28,22 +28,45 @@ module FilterSetHelper
       options[:name] = 'submit'
       options[:type] = 'submit'
       options[:class] = "submit submit-#{type}"
-      submit_value = {type: type}
       scope = options.delete :scope
       caption = options.delete :caption
+      submit_value = {type: type}
+      i18n_scope = ''
       if scope
+        i18n_scope = @helper.t("filter_set.submit.#{type}.scopes.#{scope}", default: '')
         submit_value.merge! scope: scope
-        caption ||= @helper.t("filter_set.submit.search.#{scope}", default: nil)
         options[:class] += " submit-#{type}-#{scope}"
       end
-      options[:value] = submit_value.to_json
-      @helper.render layout: "filter_set/submit/#{type}", locals: {options: options} do
-        (caption || @helper.t('filter_set.submit.search')).html_safe
+      send("submit_#{type}", type, submit_value, i18n_scope, caption, options)
+    end
+
+    def submit_search type, submit_value, i18n_scope, caption, options={}
+      submit_render type, submit_value, options do
+        caption || @helper.t("filter_set.submit.#{type}.caption", _scope: i18n_scope)
       end
     end
 
+    def submit_export type, submit_value, i18n_scope, caption, options={}
+      format = options.delete(:format) || :csv
+      submit_value.merge! format: format
+      i18n_format = @helper.t("filter_set.submit.export.formats.#{format}", default: '')
+      options[:class] += " submit-#{type}-#{format}"
+      submit_render type, submit_value, options do
+        caption || @helper.t("filter_set.submit.#{type}.caption", _scope: i18n_scope, _format: i18n_format)
+      end
+    end
+
+    protected
+
     def method_missing(m, *args, &block)
       @builder.send(m, *args, &block)
+    end
+
+    def submit_render type, submit_value, options={}
+      options[:value] = submit_value.to_json
+      @helper.render layout: "filter_set/submit/#{type}", locals: {options: options} do
+        yield.html_safe
+      end
     end
   end
 

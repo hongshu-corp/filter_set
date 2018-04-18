@@ -3,4 +3,10 @@ en:
     by:
       text: Text
     submit:
-      search: Search
+      search:
+        caption: "Search %{_scope}"
+      export:
+        caption: "Export %{_scope} in %{_format}"
+        formats:
+          csv: CSV
+          excel: Excel

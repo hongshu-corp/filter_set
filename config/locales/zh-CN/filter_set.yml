@@ -3,4 +3,10 @@ zh-CN:
     by:
       text: 文本
     submit:
-      search: 搜索
+      search:
+        caption: "搜索 %{_scope}"
+      export:
+        caption: "导出 %{_scope} %{_format}"
+        formats:
+          csv: CSV
+          excel: Excel
