@@ -28,6 +28,14 @@ RSpec.describe DemoController, type: :controller do
     end
   end
 
+  describe 'reconstruct params by __params' do
+    specify do
+      get :index, {__params: {arg: 'hello'}.to_json}
+
+      expect(controller.params[:arg]).to eq 'hello'
+    end
+  end
+
   describe 'get submit type' do
     it 'action type with no scope' do
       get :index, {submit: {type: :search}.to_json}
@@ -69,3 +77,4 @@ RSpec.describe DemoController, type: :controller do
     end
   end
 end
+

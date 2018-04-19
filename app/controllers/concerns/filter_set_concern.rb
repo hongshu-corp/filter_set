@@ -11,6 +11,12 @@ module FilterSetConcern
     @filter_action ||=OpenStruct.new(JSON(params[:submit])) if params[:submit]
   end
 
+  included do
+    before_action do
+      params.merge! JSON(params[:__params]) unless params[:__params].blank?
+    end
+  end
+
   protected
 
   def data_for_export(options = nil, extra_options = {}, &block)

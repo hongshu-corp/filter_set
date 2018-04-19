@@ -2,10 +2,11 @@ require 'rails_helper'
 
 describe FilterSetHelper, type: :helper do
   let(:request_path) { '/some-path' }
+  let(:request_path_with_args) { '/some-path?arg=hello&filter_conditions%5Btext%5D=' }
   let(:form_args) { [request_path, :get] }
 
   before do
-    allow(helper).to receive(:request).and_return double('request', path: request_path)
+    allow(helper).to receive(:request).and_return double('request', path: request_path, fullpath: request_path_with_args)
     allow(helper).to receive(:controller).and_return double('controller', { filter_conditions: OpenStruct.new })
     allow(helper).to receive(:stylesheet_link_tag).and_return ''
   end
@@ -17,6 +18,22 @@ describe FilterSetHelper, type: :helper do
 
     it 'render with form args' do
       expect(helper.filter_set method: 'post', class: 'my-form').to have_form(request_path, :post, with: {'class': 'my-form'})
+    end
+
+    it 'render with hidden field for save args' do
+      expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+        with_tag 'input', with: {name: '__params', type: 'hidden', value: {arg: 'hello'}.to_json}
+      end
+    end
+
+    describe 'should save __params in url avoid duplicated saved' do
+      let(:request_path_with_args) { '/som-path?__params=%7B"arg"%3A"hello"%7D&condition%5Bby_text%5D=&submit=%7B"type"%3A"search"%7D' }
+
+      specify do
+        expect(helper.filter_set).to have_form(*form_args) do
+          with_tag 'input', with: {name: '__params', type: 'hidden', value: {arg: 'hello'}.to_json}
+        end
+      end
     end
   end
 

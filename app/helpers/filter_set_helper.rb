@@ -1,3 +1,6 @@
+require 'rack'
+require 'uri'
+
 module FilterSetHelper
   class DefaultFilterBuilder
     def initialize builder, helper
@@ -71,9 +74,19 @@ module FilterSetHelper
   end
 
   def filter_set options={}, &block
+    object = controller.filter_conditions(options[:key])
+    main_key = options[:key]||Rails.configuration.filter_set_key
+    query_params = Rack::Utils.parse_nested_query(URI.parse(request.fullpath).query)
+    last_query_params = query_params['__params']
+    if last_query_params
+      query_params = last_query_params
+    else
+      query_params.delete main_key.to_s
+      query_params = query_params.to_json
+    end
     stylesheet_link_tag('filter_set/filter_set') +
-    form_for(controller.filter_conditions(options[:key]), as: (options[:key]||Rails.configuration.filter_set_key), url: request.path, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
-      block.call DefaultFilterBuilder.new(f, self) if block
+    form_for(object, as: main_key, url: request.path, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
+      hidden_field_tag('__params', query_params) + (block ? capture(DefaultFilterBuilder.new(f, self), &block) : '')
     end
   end
 end
