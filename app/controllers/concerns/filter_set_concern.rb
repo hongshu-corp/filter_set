@@ -8,13 +8,7 @@ module FilterSetConcern
   end
 
   def filter_action
-    @filter_action ||=OpenStruct.new(JSON(params[:submit])) if params[:submit]
-  end
-
-  included do
-    before_action do
-      params.merge! JSON(params[:__params]) unless params[:__params].blank?
-    end
+    @filter_action ||=OpenStruct.new(JSON(params[:filter_submit])) if params[:filter_submit]
   end
 
   protected

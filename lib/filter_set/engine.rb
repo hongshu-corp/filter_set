@@ -13,6 +13,7 @@ module FilterSet
       app.config.i18n.default_locale = :"zh-CN"
 
       app.config.filter_set_key = :filter_conditions
+      app.config.filter_set_submit = :filter_submit
     end
   end
 end

@@ -28,17 +28,9 @@ RSpec.describe DemoController, type: :controller do
     end
   end
 
-  describe 'reconstruct params by __params' do
-    specify do
-      get :index, {__params: {arg: 'hello'}.to_json}
-
-      expect(controller.params[:arg]).to eq 'hello'
-    end
-  end
-
   describe 'get submit type' do
     it 'action type with no scope' do
-      get :index, {submit: {type: :search}.to_json}
+      get :index, {filter_submit: {type: :search}.to_json}
 
       expect(assigns(:filter_action)).to eq (OpenStruct.new(type: 'search'))
     end
@@ -60,7 +52,7 @@ RSpec.describe DemoController, type: :controller do
       allow(controller).to receive(:export_filename_pattern).and_return(filename)
       expect(controller).to receive(:send_data).with(csv.force_encoding('binary'), type: 'text/csv', filename: filename+'.csv')
 
-      get :index, {submit: {type: :export, format: :csv}.to_json}
+      get :index, {filter_submit: {type: :export, format: :csv}.to_json}
     end
   end
 

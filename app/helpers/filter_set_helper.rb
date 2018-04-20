@@ -28,7 +28,7 @@ module FilterSetHelper
     end
 
     def submit type, options={}
-      options[:name] = 'submit'
+      options[:name] = Rails.configuration.filter_set_submit
       options[:type] = 'submit'
       options[:class] = "submit submit-#{type}"
       scope = options.delete :scope
@@ -77,17 +77,40 @@ module FilterSetHelper
     object = controller.filter_conditions(options[:key])
     main_key = options[:key]||Rails.configuration.filter_set_key
     query_params = Rack::Utils.parse_nested_query(URI.parse(request.fullpath).query)
-    last_query_params = query_params['__params']
-    if last_query_params
-      query_params = last_query_params
-    else
-      query_params.delete main_key.to_s
-      query_params = query_params.to_json
-    end
+    query_params.delete main_key.to_s
+    query_params.delete Rails.configuration.filter_set_submit.to_s
     stylesheet_link_tag('filter_set/filter_set') +
-    form_for(object, as: main_key, url: request.path, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
-      hidden_field_tag('__params', query_params) + (block ? capture(DefaultFilterBuilder.new(f, self), &block) : '')
+      form_for(object, as: main_key, url: request.path, enforce_utf8: false, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
+      key_value_to_hidden('', query_params) + (block ? capture(DefaultFilterBuilder.new(f, self), &block) : '')
     end
+  end
+
+  private
+
+  def key_value_to_hidden key, value
+    if(value.is_a? Hash)
+      hash_to_hidden key, value
+    elsif(value.is_a? Array)
+      array_to_hidden key, value
+    else
+      hidden_field_tag(key, value)
+    end
+  end
+
+  def array_to_hidden key, array
+    array.map do |v|
+      key_value_to_hidden "#{key}[]", v
+    end.sum
+  end
+
+  def hash_to_hidden key, hash
+    hash.map do |k, v|
+      key_value_to_hidden build_key(key, k), v
+    end.sum
+  end
+
+  def build_key key, sub_key
+    key.blank? ? sub_key : "#{key}[#{sub_key}]"
   end
 end
 

@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe FilterSetHelper, type: :helper do
   let(:request_path) { '/some-path' }
-  let(:request_path_with_args) { '/some-path?arg=hello&filter_conditions%5Btext%5D=' }
   let(:form_args) { [request_path, :get] }
+  let(:request_path_with_args) { '/some-path?arg=hello&filter_conditions%5Btext%5D=' }
 
   before do
     allow(helper).to receive(:request).and_return double('request', path: request_path, fullpath: request_path_with_args)
@@ -19,19 +19,52 @@ describe FilterSetHelper, type: :helper do
     it 'render with form args' do
       expect(helper.filter_set method: 'post', class: 'my-form').to have_form(request_path, :post, with: {'class': 'my-form'})
     end
+  end
 
-    it 'render with hidden field for save args' do
+  describe 'render other params' do
+    let(:args) { {arg: 'hello'} }
+    let(:request_path_with_args) { '/some-path?' + args.to_query }
+
+    it 'render with hidden field for save args simple args' do
       expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
-        with_tag 'input', with: {name: '__params', type: 'hidden', value: {arg: 'hello'}.to_json}
+        with_tag 'input', with: {name: 'arg', type: 'hidden', value: 'hello'}
       end
     end
 
-    describe 'should save __params in url avoid duplicated saved' do
-      let(:request_path_with_args) { '/som-path?__params=%7B"arg"%3A"hello"%7D&condition%5Bby_text%5D=&submit=%7B"type"%3A"search"%7D' }
-
+    describe 'render with hidden field for save nested hash args' do
+      let(:args) { {arg: {word: 'hello'}} }
       specify do
-        expect(helper.filter_set).to have_form(*form_args) do
-          with_tag 'input', with: {name: '__params', type: 'hidden', value: {arg: 'hello'}.to_json}
+        expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+          with_tag 'input', with: {name: 'arg[word]', type: 'hidden', value: 'hello'}
+        end
+      end
+    end
+
+    describe 'render with hidden field for save args array args' do
+      let(:args) { {arg: ['hello', 'world']} }
+      specify do
+        expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+          with_tag 'input', with: {name: 'arg[]', type: 'hidden', value: 'hello'}
+          with_tag 'input', with: {name: 'arg[]', type: 'hidden', value: 'world'}
+        end
+      end
+    end
+
+    #describe 'render with hidden field for save nested array args' do
+      #let(:args) { {arg: [['hello']]} }
+      #specify do
+        #expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+          #with_tag 'input', with: {name: 'arg[][]', type: 'hidden', value: 'hello'}
+        #end
+      #end
+    #end
+
+    describe 'render with hidden field for save args hash args' do
+      let(:args) { {arg: {a: 1, b: 2}} }
+      specify do
+        expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+          with_tag 'input', with: {name: 'arg[a]', type: 'hidden', value: '1'}
+          with_tag 'input', with: {name: 'arg[b]', type: 'hidden', value: '2'}
         end
       end
     end
@@ -104,7 +137,7 @@ describe FilterSetHelper, type: :helper do
       expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: '').and_return('I18nSearch')
 
       expect(helper.filter_set{|fs| fs.submit :search}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search}.to_json}", class: 'submit submit-search'}, text: 'I18nSearch'
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :search}.to_json}", class: 'submit submit-search'}, text: 'I18nSearch'
       end
     end
 
@@ -113,13 +146,13 @@ describe FilterSetHelper, type: :helper do
       expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: 'I18nOrder').and_return('I18nSearchOrder')
 
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearchOrder'
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'I18nSearchOrder'
       end
     end
 
     it 'search with scope and caption' do
       expect(helper.filter_set{|fs| fs.submit :search, scope: :order, caption: 'GO'}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'GO'
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :search, scope: :order}.to_json}", class: 'submit submit-search submit-search-order'}, text: 'GO'
       end
     end
   end
@@ -130,7 +163,7 @@ describe FilterSetHelper, type: :helper do
       expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: '', _format: 'I18nCSV').and_return('I18nExport')
 
       expect(helper.filter_set{|fs| fs.submit :export}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :export, format: :csv}.to_json}", class: 'submit submit-export submit-export-csv'}, text: 'I18nExport'
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, format: :csv}.to_json}", class: 'submit submit-export submit-export-csv'}, text: 'I18nExport'
       end
     end
 
@@ -140,7 +173,7 @@ describe FilterSetHelper, type: :helper do
       expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: 'I18nPaging', _format: 'I18nEXCEL').and_return('I18nExport')
 
       expect(helper.filter_set{|fs| fs.submit :export, format: :excel, scope: 'pagging'}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'submit', value: "#{{type: :export, scope: 'pagging', format: :excel}.to_json}", class: 'submit submit-export submit-export-excel submit-export-pagging'}, text: 'I18nExport'
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, scope: 'pagging', format: :excel}.to_json}", class: 'submit submit-export submit-export-excel submit-export-pagging'}, text: 'I18nExport'
       end
     end
   end
