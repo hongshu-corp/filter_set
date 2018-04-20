@@ -8,7 +8,15 @@ module FilterSetConcern
   end
 
   def filter_action
-    @filter_action ||=OpenStruct.new(JSON(params[:filter_submit])) if params[:filter_submit]
+    @filter_action ||=OpenStruct.new(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
+  end
+
+  included do
+    before_action do
+      if filter_action && filter_action.paging.to_s.downcase != 'true'
+        params.delete(Rails.configuration.filter_set_page_params)
+      end
+    end
   end
 
   protected

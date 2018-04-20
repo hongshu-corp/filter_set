@@ -81,7 +81,8 @@ module FilterSetHelper
     query_params.delete Rails.configuration.filter_set_submit.to_s
     stylesheet_link_tag('filter_set/filter_set') +
       form_for(object, as: main_key, url: request.path, enforce_utf8: false, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
-      key_value_to_hidden('', query_params) + (block ? capture(DefaultFilterBuilder.new(f, self), &block) : '')
+      concat(key_value_to_hidden('', query_params)) if query_params.size > 0
+      concat(capture(DefaultFilterBuilder.new(f, self), &block)) if block
     end
   end
 

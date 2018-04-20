@@ -4,7 +4,7 @@ require 'csv'
 RSpec.describe DemoController, type: :controller do
   describe 'get conditions object in controller' do
     it 'set default empty objects' do
-      DemoController.key = nil
+      DemoController.filter_key = nil
 
       get :index
 
@@ -12,7 +12,7 @@ RSpec.describe DemoController, type: :controller do
     end
 
     it 'get object by default key in params' do
-      DemoController.key = nil
+      DemoController.filter_key = nil
 
       get :index, {filter_conditions: {text: 'Hello'}}
 
@@ -20,7 +20,7 @@ RSpec.describe DemoController, type: :controller do
     end
 
     it 'get object by search params' do
-      DemoController.key = :my_conditions_key
+      DemoController.filter_key = :my_conditions_key
 
       get :index, {my_conditions_key: {text: 'Hello'}}
 
@@ -33,6 +33,26 @@ RSpec.describe DemoController, type: :controller do
       get :index, {filter_submit: {type: :search}.to_json}
 
       expect(assigns(:filter_action)).to eq (OpenStruct.new(type: 'search'))
+    end
+  end
+
+  describe 'default skip pagging args' do
+    it 'do not skip pagging params when no submit' do
+      get :index, {page: 1}
+
+      expect(assigns(:page)).to eq '1'
+    end
+
+    it 'skip pagging params when submit filter' do
+      get :index, {page: 1, filter_submit: {type: :search}.to_json }
+
+      expect(assigns(:page)).to eq nil
+    end
+
+    it 'keep page when submit current page' do
+      get :index, {page: 1, filter_submit: {type: :search, paging: true}.to_json }
+
+      expect(assigns(:page)).to eq '1'
     end
   end
 
