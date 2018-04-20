@@ -10,10 +10,16 @@ class DemoController < ApplicationController
     @@page_key = value
   end
 
+  def name3
+    ['good', 'bye']
+  end
+
   def index
     @selected_conditions = filter_conditions @@filter_key
     @filter_action = filter_action
     @page = params[@@page_key]
+    @name2 = ['hello', 'world']
+    @source = ['bye']
   end
 end
 

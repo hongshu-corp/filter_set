@@ -68,11 +68,64 @@ RSpec.describe DemoController, type: :controller do
 
     let(:filename) { 'csv' }
 
-    it 'export data' do
+    before do
       allow(controller).to receive(:export_filename_pattern).and_return(filename)
       expect(controller).to receive(:send_data).with(csv.force_encoding('binary'), type: 'text/csv', filename: filename+'.csv')
+    end
 
+    it 'export data' do
       get :index, {filter_submit: {type: :export, format: :csv}.to_json}
+    end
+
+    describe 'export with custorm template' do
+      let(:csv) do
+        CSV.generate do |csv|
+          csv << ['0', '1']
+          csv << ['2', '3']
+        end
+      end
+
+      specify do
+        get :index, {filter_submit: {type: :export, format: :csv, template: 'export_table1'}.to_json}
+      end
+    end
+
+    describe 'export with custorm template, data_name and same data source as @name' do
+      let(:csv) do
+        CSV.generate do |csv|
+          csv << ['hello']
+          csv << ['world']
+        end
+      end
+
+      specify do
+        get :index, {filter_submit: {type: :export, format: :csv, template: 'export_table2', data_name: 'name2'}.to_json}
+      end
+    end
+
+    describe 'export with custorm template, data_name and same data source as name' do
+      let(:csv) do
+        CSV.generate do |csv|
+          csv << ['good']
+          csv << ['bye']
+        end
+      end
+
+      specify do
+        get :index, {filter_submit: {type: :export, format: :csv, template: 'export_table3', data_name: 'name3'}.to_json}
+      end
+    end
+
+    describe 'export with custorm template, data_name and same data source as name' do
+      let(:csv) do
+        CSV.generate do |csv|
+          csv << ['bye']
+        end
+      end
+
+      specify do
+        get :index, {filter_submit: {type: :export, format: :csv, template: 'export_table2', data_name: 'name2', data_source: '@source'}.to_json}
+      end
     end
   end
 

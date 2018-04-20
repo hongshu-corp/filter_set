@@ -22,8 +22,20 @@ module FilterSetConcern
   protected
 
   def data_for_export(options = nil, extra_options = {}, &block)
-    #todo different slim
-    render_to_string options, extra_options, &block
+    if filter_action.template.blank?
+      render_to_string options, extra_options, &block
+    else
+      locals = {}
+      unless filter_action.data_name.blank?
+        if filter_action.data_source.blank?
+          data = instance_variable_get("@#{filter_action.data_name}")||send(filter_action.data_name)
+        else
+          data = eval(filter_action.data_source)
+        end
+        locals = {filter_action.data_name.to_sym => data}
+      end
+      render_to_string partial: filter_action.template, locals: locals
+    end
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -80,6 +92,25 @@ module FilterSetConcern
     end
   end
 
+  def export_to_excel tables
+    workbook = RubyXL::Workbook.new
+    tables.each_with_index do |table, sheet_index|
+      sheet = workbook[sheet_index]
+      if sheet.nil?
+        sheet = workbook.add_worksheet "Sheet#{sheet_index+1}"
+      end
+
+      table.each_with_index do |tr, row_index|
+        tr.each_with_index do |cell, cell_index|
+          sheet.add_cell(row_index, cell_index, cell)
+        end
+      end
+    end
+    workbook.stream.string
+  end
+
   #todo export_to_excel
+  #export table with css
+  #export table to excel sheet name
 end
 
