@@ -84,6 +84,9 @@ module FilterSetHelper
     query_params = Rack::Utils.parse_nested_query(URI.parse(request.fullpath).query)
     query_params.delete main_key.to_s
     query_params.delete Rails.configuration.filter_set_submit.to_s
+    Rails.configuration.filter_set_page_params.each do |k|
+      query_params.delete "__#{k}"
+    end
     page_params = Rails.configuration.filter_set_page_params.map(&:to_s).map {|k| [k, query_params.delete(k)]}
     stylesheet_link_tag('filter_set/filter_set') +
       form_for(object, as: main_key, url: request.path, enforce_utf8: false, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
