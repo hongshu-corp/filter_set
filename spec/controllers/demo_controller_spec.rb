@@ -37,23 +37,24 @@ RSpec.describe DemoController, type: :controller do
   end
 
   describe 'default skip pagging args' do
-    #it 'do not skip pagging params when no submit' do
-      #get :index, {page: 1}
+    it 'do not skip pagging params when no submit' do
+      get :index, {page: 1}
 
-      #expect(assigns(:page)).to eq '1'
-    #end
+      expect(assigns(:page)).to eq '1'
+    end
 
-    #it 'skip pagging params when submit filter' do
-      #get :index, {page: 1, filter_submit: {type: :search}.to_json }
+    it 'skip pagging params when submit filter' do
+      get :index, {page: 1, filter_submit: {type: :search}.to_json }
 
-      #expect(assigns(:page)).to eq nil
-    #end
+      expect(assigns(:page)).to eq nil
+    end
 
-    #it 'keep page when submit current page' do
-      #get :index, {page: 1, filter_submit: {type: :search, paging: true}.to_json }
+    it 'keep page when submit current page' do
+      get :index, {page: 1, filter_submit: {type: :search, paging: true}.to_json }
 
-      #expect(assigns(:page)).to eq '1'
-    #end
+      expect(assigns(:page)).to eq '1'
+    end
+
     let(:model) { double 'model', paginate: '' }
 
     before do

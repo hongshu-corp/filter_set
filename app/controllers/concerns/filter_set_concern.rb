@@ -12,11 +12,11 @@ module FilterSetConcern
   end
 
   included do
-    #before_action do
-      #if filter_action && filter_action.paging.to_s.downcase != 'true'
-        #params.delete(Rails.configuration.filter_set_page_params)
-      #end
-    #end
+    before_action do
+      if filter_action && filter_action.paging.to_s.downcase != 'true'
+        params.delete(Rails.configuration.filter_set_page_params)
+      end
+    end
 
     protected
 
