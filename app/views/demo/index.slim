@@ -18,3 +18,14 @@ table
     td c
     td d
 
+- if @css_table
+  table class=@table_class
+    - @css_table.each do |r|
+      tr
+        td = r
+
+- if @css_table
+  .table class=@table_class
+    - @css_table.each do |r|
+      .tr
+        .td = r

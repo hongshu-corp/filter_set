@@ -4,7 +4,7 @@ require 'csv'
 RSpec.describe DemoController, type: :controller do
   describe 'get conditions object in controller' do
     it 'set default empty objects' do
-      DemoController.filter_key = nil
+      controller.filter_key = nil
 
       get :index
 
@@ -12,7 +12,7 @@ RSpec.describe DemoController, type: :controller do
     end
 
     it 'get object by default key in params' do
-      DemoController.filter_key = nil
+      controller.filter_key = nil
 
       get :index, {filter_conditions: {text: 'Hello'}}
 
@@ -20,7 +20,7 @@ RSpec.describe DemoController, type: :controller do
     end
 
     it 'get object by search params' do
-      DemoController.filter_key = :my_conditions_key
+      controller.filter_key = :my_conditions_key
 
       get :index, {my_conditions_key: {text: 'Hello'}}
 
@@ -125,6 +125,86 @@ RSpec.describe DemoController, type: :controller do
 
       specify do
         get :index, {filter_submit: {type: :export, format: :csv, template: 'export_table2', data_name: 'name2', data_source: '@source'}.to_json}
+      end
+    end
+
+    describe 'export with css' do
+      let(:table_class) { 'table_class' }
+      let(:css_table) { ['hello', 'world'] }
+      let(:csv) do
+        CSV.generate do |csv|
+          css_table.each do |r|
+            csv << [r]
+          end
+        end
+      end
+
+      specify do
+        controller.instance_variable_set(:@table_class, table_class)
+        controller.instance_variable_set(:@css_table, css_table)
+        get :index, {filter_submit: {type: :export, format: :csv, data_css: '.table_class'}.to_json}
+      end
+    end
+  end
+
+  describe 'export excel' do
+    render_views
+    let!(:workbook) { RubyXL::Workbook.new }
+    let(:content) do
+      workbook.worksheets.map do |sheet|
+        [sheet.sheet_name, sheet.map do|r|
+          r.cells.map(&:value)
+        end]
+      end.to_h
+    end
+
+    before do
+      allow(RubyXL::Workbook).to receive(:new).and_return(workbook)
+    end
+
+    it 'export data' do
+      get :index, {filter_submit: {type: :export, format: :excel}.to_json}
+
+      expect(content).to eq({"Sheet1" => [['a', 'b'], ['c', 'd']]})
+    end
+
+    it 'export data with sheet_name' do
+      get :index, {filter_submit: {type: :export, format: :excel, sheet_name: 'sheet'}.to_json}
+
+      expect(content).to eq({'sheet' => [['a', 'b'], ['c', 'd']]})
+    end
+
+    describe 'export data with css' do
+      let(:table_class) { 'table_class' }
+      let(:css_table) { ['hello', 'world'] }
+
+      before do
+        controller.instance_variable_set(:@table_class, table_class)
+        controller.instance_variable_set(:@css_table, css_table)
+      end
+
+      it 'export data with css' do
+        get :index, {filter_submit: {type: :export, format: :excel, data_css: '.table_class'}.to_json}
+
+        expect(content).to eq({".table_class" => [['hello'], ['world']]})
+      end
+
+      it 'export data with css and name' do
+        get :index, {filter_submit: {type: :export, format: :excel, data_css: '.table_class', sheet_name: 'sheet'}.to_json}
+
+        expect(content).to eq({"sheet" => [['hello'], ['world']]})
+      end
+
+      it 'export data with css-name pattern' do
+        get :index, {filter_submit: {type: :export, format: :excel, data_pattern: {'.table_class': 'sheet'}}.to_json}
+
+        expect(content).to eq({"sheet" => [['hello'], ['world']]})
+      end
+
+      it 'export data with css row and cell' do
+        get :index, {filter_submit: {type: :export, format: :excel, data_css: '.table', row_css: '.tr', cell_css: '.td'}.to_json}
+
+        expect(content).to eq({".table" => [['hello'], ['world']]})
       end
     end
   end

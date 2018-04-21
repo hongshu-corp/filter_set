@@ -26,7 +26,7 @@ module FilterSetConcern
       render_to_string options, extra_options, &block
     else
       locals = {}
-      unless filter_action.data_name.blank?
+      if filter_action.data_name.present?
         if filter_action.data_source.blank?
           data = instance_variable_get("@#{filter_action.data_name}")||send(filter_action.data_name)
         else
@@ -73,44 +73,83 @@ module FilterSetConcern
     end
   end
 
-  def parse_to_tables content
-    docs = Nokogiri::XML(content)
-    docs.xpath('//table').map do |table|
-      table.xpath('tr|*/tr').map do |tr|
-        tr.xpath("td[not(contains(@class, 'no-export'))]|th[not(contains(@class, 'no-export'))]").map do |cell|
+  def parse_to_table doc, tab
+    tab = tab.present? ? tab : 'table'
+    row = filter_action.row_css || 'tr'
+    cell = filter_action.cell_css || nil
+    doc.css(tab).map do |table|
+      table.css(row).map do |tr|
+        (cell.present? ? tr.css(cell) : tr.xpath("td[not(contains(@class, 'no-export'))]|th[not(contains(@class, 'no-export'))]")).map do |cell|
           cell.text.strip
         end
       end
     end
   end
 
+  def parse_to_tables content
+    doc = Nokogiri::HTML(content)
+    if filter_action.data_pattern
+      filter_action.data_pattern.map do |data_css, _|
+        tables = parse_to_table(doc, data_css)
+        tables ? [data_css, tables] : nil
+      end.compact.to_h
+    else
+      tables = parse_to_table(doc, filter_action.data_css)
+      tables ? { filter_action.data_css => tables } : {}
+    end
+  end
+
   def export_to_csv tables
     CSV.generate do |csv|
-      tables.flat_map{|table| table}.each do |row|
+      tables.values.flat_map{|tables| tables}.flat_map{|table| table}.each do |row|
         csv << row
       end
     end
   end
 
-  def export_to_excel tables
-    workbook = RubyXL::Workbook.new
-    tables.each_with_index do |table, sheet_index|
-      sheet = workbook[sheet_index]
-      if sheet.nil?
-        sheet = workbook.add_worksheet "Sheet#{sheet_index+1}"
-      end
+  def export_table_to_excel workbook, table, index, css=nil
+    sheet = workbook[index]
 
-      table.each_with_index do |tr, row_index|
-        tr.each_with_index do |cell, cell_index|
-          sheet.add_cell(row_index, cell_index, cell)
-        end
+    sheet_name = if index == 0
+      filter_action.sheet_name
+    end
+    sheet_name ||= if css.present?
+                     if filter_action.data_pattern
+                       filter_action.data_pattern[css] || css
+                     else
+                      css
+                     end
+                   else
+                     "Sheet#{index+1}"
+                   end
+
+    if sheet.nil?
+      sheet = workbook.add_worksheet sheet_name
+    else
+      sheet.sheet_name = sheet_name
+    end
+
+    table.each_with_index do |tr, row_index|
+      tr.each_with_index do |cell, cell_index|
+        sheet.add_cell row_index, cell_index, cell
+      end
+    end
+  end
+
+  def export_to_excel tables_hash
+    workbook = RubyXL::Workbook.new
+    if tables_hash.keys[0].blank?
+      tables_hash.values[0].each_with_index do |table, index|
+        export_table_to_excel workbook, table, index
+      end
+    else
+      tables_hash.each_with_index.each do |key_tables, index|
+        css = key_tables.first
+        table = key_tables.last.first
+        export_table_to_excel workbook, table, index, css
       end
     end
     workbook.stream.string
   end
-
-  #todo export_to_excel
-  #export table with css
-  #export table to excel sheet name
 end
 
