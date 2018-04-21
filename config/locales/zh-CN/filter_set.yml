@@ -6,7 +6,8 @@ zh-CN:
       search:
         caption: "搜索 %{_scope}"
       export:
-        caption: "导出 %{_scope} %{_format}"
+        caption: "导出 %{_scope} %{_format} %{_paging}"
+        paging: (当前页)
         formats:
           csv: CSV
           excel: Excel

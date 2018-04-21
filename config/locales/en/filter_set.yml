@@ -6,7 +6,8 @@ en:
       search:
         caption: "Search %{_scope}"
       export:
-        caption: "Export %{_scope} in %{_format}"
+        caption: "Export %{_scope} in %{_format} %{_paging}"
+        paging: (Current page)
         formats:
           csv: CSV
           excel: Excel

@@ -14,7 +14,7 @@ module FilterSet
 
       app.config.filter_set_key = :filter_conditions
       app.config.filter_set_submit = :filter_submit
-      app.config.filter_set_page_params = :page
+      app.config.filter_set_page_params = [:page, :per_page]
     end
   end
 end

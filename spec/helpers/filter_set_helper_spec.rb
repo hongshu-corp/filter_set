@@ -68,6 +68,18 @@ describe FilterSetHelper, type: :helper do
         end
       end
     end
+
+    describe 'do not save paging args' do
+      let(:args) { {page: 1, per_page: 30} }
+      specify do
+        expect(helper.filter_set {|f| f.by :text}).to have_form(*form_args) do
+          without_tag 'input', with: {name: 'page', type: 'hidden', value: '1'}
+          without_tag 'input', with: {name: 'per_page', type: 'hidden', value: '30'}
+          with_tag 'input', with: {name: '__page', type: 'hidden', value: '1'}
+          with_tag 'input', with: {name: '__per_page', type: 'hidden', value: '30'}
+        end
+      end
+    end
   end
 
   describe 'render text field' do
@@ -160,7 +172,7 @@ describe FilterSetHelper, type: :helper do
   describe 'render export' do
     it 'default export csv button' do
       expect(helper).to receive(:t).with('filter_set.submit.export.formats.csv', default: '').and_return('I18nCSV')
-      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: '', _format: 'I18nCSV').and_return('I18nExport')
+      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: '', _format: 'I18nCSV', _paging: '').and_return('I18nExport')
 
       expect(helper.filter_set{|fs| fs.submit :export}).to have_form(*form_args) do
         with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, format: :csv}.to_json}", class: 'submit submit-export submit-export-csv'}, text: 'I18nExport'
@@ -169,11 +181,21 @@ describe FilterSetHelper, type: :helper do
 
     it 'export with args' do
       expect(helper).to receive(:t).with('filter_set.submit.export.formats.excel', default: '').and_return('I18nEXCEL')
-      expect(helper).to receive(:t).with('filter_set.submit.export.scopes.pagging', default: '').and_return('I18nPaging')
-      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: 'I18nPaging', _format: 'I18nEXCEL').and_return('I18nExport')
+      expect(helper).to receive(:t).with('filter_set.submit.export.scopes.order', default: '').and_return('I18nOrder')
+      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: 'I18nOrder', _format: 'I18nEXCEL', _paging: '').and_return('I18nExport')
 
-      expect(helper.filter_set{|fs| fs.submit :export, format: :excel, scope: 'pagging'}).to have_form(*form_args) do
-        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, scope: 'pagging', format: :excel}.to_json}", class: 'submit submit-export submit-export-excel submit-export-pagging'}, text: 'I18nExport'
+      expect(helper.filter_set{|fs| fs.submit :export, format: :excel, scope: 'order'}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, scope: 'order', format: :excel}.to_json}", class: 'submit submit-export submit-export-excel submit-export-order'}, text: 'I18nExport'
+      end
+    end
+
+    it 'export with current page' do
+      expect(helper).to receive(:t).with('filter_set.submit.export.formats.csv', default: '').and_return('I18nCSV')
+      expect(helper).to receive(:t).with('filter_set.submit.export.paging', default: '').and_return('I18nPaging')
+      expect(helper).to receive(:t).with('filter_set.submit.export.caption', _scope: '', _format: 'I18nCSV', _paging: 'I18nPaging').and_return('I18nExport')
+
+      expect(helper.filter_set{|fs| fs.submit :export, paging: true}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :export, format: :csv, paging: true}.to_json}", class: 'submit submit-export submit-export-csv'}, text: 'I18nExport'
       end
     end
   end

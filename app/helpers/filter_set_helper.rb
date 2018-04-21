@@ -53,9 +53,14 @@ module FilterSetHelper
       format = options.delete(:format) || :csv
       submit_value.merge! format: format
       i18n_format = @helper.t("filter_set.submit.export.formats.#{format}", default: '')
+      i18n_paging = if options.delete(:paging).to_s.downcase == 'true'
+                      submit_value.merge! paging: true
+                      @helper.t("filter_set.submit.export.paging", default: '')
+                    end.to_s
+
       options[:class] += " submit-#{type}-#{format}"
       submit_render type, submit_value, options do
-        caption || @helper.t("filter_set.submit.#{type}.caption", _scope: i18n_scope, _format: i18n_format)
+        caption || @helper.t("filter_set.submit.#{type}.caption", _scope: i18n_scope, _format: i18n_format, _paging: i18n_paging)
       end
     end
 
@@ -79,8 +84,14 @@ module FilterSetHelper
     query_params = Rack::Utils.parse_nested_query(URI.parse(request.fullpath).query)
     query_params.delete main_key.to_s
     query_params.delete Rails.configuration.filter_set_submit.to_s
+    page_params = Rails.configuration.filter_set_page_params.map(&:to_s).map {|k| [k, query_params.delete(k)]}
     stylesheet_link_tag('filter_set/filter_set') +
       form_for(object, as: main_key, url: request.path, enforce_utf8: false, html: {'class': options[:class]||'filter-set'}, method: options[:method]||'get') do |f|
+      page_params.each do |k, v|
+        if v.present?
+          concat(key_value_to_hidden "__#{k}", v)
+        end
+      end
       concat(key_value_to_hidden('', query_params)) if query_params.size > 0
       concat(capture(DefaultFilterBuilder.new(f, self), &block)) if block
     end

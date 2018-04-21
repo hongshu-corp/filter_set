@@ -18,7 +18,7 @@ class DemoController < ApplicationController
   def index
     @selected_conditions = filter_conditions @filter_key
     @filter_action = filter_action
-    @page = params[Rails.configuration.filter_set_page_params]
+    #@page = params[Rails.configuration.filter_set_page_params]
     @name2 = ['hello', 'world']
     @source = ['bye']
   end
