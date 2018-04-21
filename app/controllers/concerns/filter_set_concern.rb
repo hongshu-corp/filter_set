@@ -12,11 +12,11 @@ module FilterSetConcern
   end
 
   included do
-    before_action do
-      if filter_action && filter_action.paging.to_s.downcase != 'true'
-        params.delete(Rails.configuration.filter_set_page_params)
-      end
-    end
+    #before_action do
+      #if filter_action && filter_action.paging.to_s.downcase != 'true'
+        #params.delete(Rails.configuration.filter_set_page_params)
+      #end
+    #end
 
     protected
 
@@ -31,6 +31,14 @@ module FilterSetConcern
   end
 
   protected
+
+  def paginate rel, page_method: :paginate
+    if filter_action && filter_action.paging.to_s.downcase != 'true'
+      rel
+    else
+      rel.send page_method, params.slice(:page, :perpage)
+    end
+  end
 
   def data_for_export(options = nil, extra_options = {}, &block)
     if filter_action.template.blank?
