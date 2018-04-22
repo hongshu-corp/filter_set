@@ -15,6 +15,9 @@ class DemoController < ApplicationController
     @table_class = value
   end
 
+  def filter_text_object
+  end
+
   def index
     @selected_conditions = filter_conditions @filter_key
     @filter_action = filter_action

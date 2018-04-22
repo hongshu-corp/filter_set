@@ -4,11 +4,25 @@ module FilterSetConcern
   extend ActiveSupport::Concern
 
   def filter_conditions key=nil
-    OpenStruct.new((params[key||Rails.configuration.filter_set_key] || {}).as_json)
+    key ||= Rails.configuration.filter_set_key
+    @filter_conditions ||= {}
+    @filter_conditions[key] ||= build_filter_conditions(key)
+    @filter_conditions[key]
   end
 
   def filter_action
     @filter_action ||=OpenStruct.new(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
+  end
+
+  private
+
+  def build_filter_conditions key
+    obj = OpenStruct.new((params[key] || {}).as_json)
+    obj.to_h.keys.each do |key|
+      obj_value = self.try "filter_#{key}_object"
+      obj["#{key}_object".to_sym] = obj_value if obj_value
+    end
+    obj
   end
 
   included do

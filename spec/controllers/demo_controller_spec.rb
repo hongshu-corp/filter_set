@@ -26,6 +26,15 @@ RSpec.describe DemoController, type: :controller do
 
       expect(assigns(:selected_conditions)).to eq (OpenStruct.new(text: 'Hello'))
     end
+
+    it 'get object by hook' do
+      controller.filter_key = nil
+      allow(controller).to receive(:filter_text_object).and_return('Hello object')
+
+      get :index, {filter_conditions: {text: 'Hello'}}
+
+      expect(assigns(:selected_conditions).text_object).to eq 'Hello object'
+    end
   end
 
   describe 'get submit type' do
