@@ -33,10 +33,10 @@ Rendered HTML:
 ```
 Label and button text can be changed by options(:caption) or I18n yml
 
-## Filter by
+## Filter types
 ### Common options
 #### :caption
-Set caption before filter field. Default value is I18n.t("filter_set.by.#{type}")
+Set label caption before filter field. Default value is I18n.t("filter_set.by.#{type}")
 
 #### :key
 Rename the filter field name.
@@ -50,7 +50,7 @@ Rename the filter field name.
   Message.where sender: filter_conditions.sender, receiver: filter_conditions.receiver
 ```
 
-If use option :key with out :caption, I18n.t("filter_set.by.#{key}") will be shown as label text.
+If use option :key without :caption, I18n.t("filter_set.by.#{key}") will be shown as label text.
 
 ``` ruby
   # In slim:
@@ -72,7 +72,7 @@ Rendered HTML:
 
 ### Supported field types:
 #### :text
-Render a input with type 'text'.
+Render a text input as a filter condition.
 
 ### Define filter
 Define partial views in views/filter_set/_new_type.slim
@@ -90,10 +90,11 @@ use:
 ```
 
 
-## Submit
+## Filter Submit
 ### Common options
 #### :caption
 Set caption on the button.
+
 Default value is I18n.t("filter_set.submit.#{type}.caption", _scope: I18n.t(filter_set.submit.#{type}.scopes.#{scope}), [other formets])
 
 #### :scope
@@ -109,6 +110,7 @@ Render a submit button for search
 
 #### :export
 Render a submit button for export
+
 Options for export:
 
 |option | values | remark|
