@@ -88,6 +88,16 @@ module FilterSetConcern
     end
   end
 
+  def text_of_element e
+    if e.children.count == 0
+      [ e.text.strip ]
+    else
+      e.children.map do |c|
+        text_of_element c
+      end.sum []
+    end
+  end
+
   def parse_to_table doc, tab
     tab = tab.present? ? tab : 'table'
     row = filter_action.row_css || 'tr'
@@ -95,7 +105,7 @@ module FilterSetConcern
     doc.css(tab).map do |table|
       table.css(row).map do |tr|
         (cell.present? ? tr.css(cell) : tr.xpath("td[not(contains(@class, 'no-export'))]|th[not(contains(@class, 'no-export'))]")).map do |cell|
-          cell.text.strip
+          text_of_element(cell).select(&:present?).join(' ')
         end
       end
     end
