@@ -152,3 +152,16 @@ Options for export:
     = filter.submit :export, data_pattern: {'.orders': 'Order List', '.users': 'User List'}
     # will export first table of '.orders' to excel with sheet name 'Order List', first table of '.users' to excel with sheet name 'User List'
 ```
+To make paging params work in data export, paginate logic controller
+``` ruby
+  def index
+    @orders = Order.all.paginate page: params[:page]
+  end
+```
+should be changed to:
+``` ruby
+  def index
+    @orders = paginate Order.all
+  end
+```
+
