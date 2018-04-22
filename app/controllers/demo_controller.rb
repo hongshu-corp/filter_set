@@ -15,7 +15,7 @@ class DemoController < ApplicationController
     @table_class = value
   end
 
-  def filter_text_object
+  def filter_text_object v
   end
 
   def index

@@ -33,6 +33,18 @@ Rendered HTML:
 ```
 Label and button text can be changed by options(:caption) or I18n yml
 
+Define method to transform string to object in controller
+``` ruby
+  def filter_text_object value
+    Order.find_by_id value
+  end
+
+  # GET index
+  def index
+    @orders = [filter_conditions.text_object]
+  end
+```
+
 ## Filter types
 ### Common options
 #### :caption

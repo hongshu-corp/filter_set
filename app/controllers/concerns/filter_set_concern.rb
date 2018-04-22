@@ -18,8 +18,8 @@ module FilterSetConcern
 
   def build_filter_conditions key
     obj = OpenStruct.new((params[key] || {}).as_json)
-    obj.to_h.keys.each do |key|
-      obj_value = self.try "filter_#{key}_object"
+    obj.to_h.each do |key, value|
+      obj_value = self.try "filter_#{key}_object", value
       obj["#{key}_object".to_sym] = obj_value if obj_value
     end
     obj
