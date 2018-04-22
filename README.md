@@ -111,18 +111,18 @@ Render a submit button for search
 Render a submit button for export
 Options for export:
 
-option | values | remark
-- | - | -
-:format | :csv(default)/:excel | File format
-:paging | true/false (default) | Export with paging(only support will_paginate)
-:template | string | partial template for exporting
-:data_name | symbol | var name for partial template render
-:data_source | string | data_source for data_name
-:data_css | string | css selector for export, default is 'table'
-:row_css | string | css selector for data row, default is 'tr'
-:cell_css | string | css selector for data cell, default is all td and th with out class 'no-export'
-:sheet_name | string | use for sheet name in excel
-:data_pattern | hash | export css and sheet name for excel export
+|option | values | remark|
+|- | - | -|
+|:format | :csv(default)/:excel | File format|
+|:paging | true/false (default) | Export with paging(only support will_paginate)|
+|:template | string | partial template for exporting|
+|:data_name | symbol | var name for partial template render|
+|:data_source | string | data_source for data_name|
+|:data_css | string | css selector for export, default is 'table'|
+|:row_css | string | css selector for data row, default is 'tr'|
+|:cell_css | string | css selector for data cell, default is all td and th with out class 'no-export'|
+|:sheet_name | string | use for sheet name in excel|
+|:data_pattern | hash | export css and sheet name for excel export|
 
 ``` ruby
   # in slim
