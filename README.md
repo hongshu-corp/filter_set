@@ -93,8 +93,7 @@ use:
 ## Filter Submit
 ### Common options
 #### :caption
-Set caption on the button.
-
+Set caption on the button.  
 Default value is I18n.t("filter_set.submit.#{type}.caption", _scope: I18n.t(filter_set.submit.#{type}.scopes.#{scope}), [other formets])
 
 #### :scope
@@ -109,8 +108,7 @@ If option :scope was set, it will try to get I18n.t(filter_set.submit.#{type}.sc
 Render a submit button for search
 
 #### :export
-Render a submit button for export
-
+Render a submit button for export  
 Options for export:
 
 |option | values | remark|
