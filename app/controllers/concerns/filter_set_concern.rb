@@ -32,8 +32,6 @@ module FilterSetConcern
       #end
     #end
 
-    protected
-
     def render(options = nil, extra_options = {}, &block)
       if filter_action && filter_action.type == 'export' && !filter_action.rendered
         filter_action[:rendered] = true
