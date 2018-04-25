@@ -30,7 +30,7 @@ module FilterSetHelper
     def submit type, options={}
       options[:name] = Rails.configuration.filter_set_submit
       options[:type] = 'submit'
-      options[:class] = "submit submit-#{type}"
+      options[:_class] = "submit submit-#{type}"
       scope = options.delete :scope
       caption = options.delete :caption
       submit_value = {type: type}
@@ -38,7 +38,7 @@ module FilterSetHelper
       if scope
         i18n_scope = @helper.t("filter_set.submit.#{type}.scopes.#{scope}", default: '')
         submit_value.merge! scope: scope
-        options[:class] += " submit-#{type}-#{scope}"
+        options[:_class] += " submit-#{type}-#{scope}"
       end
       send("submit_#{type}", type, submit_value, i18n_scope, caption, options)
     end
@@ -58,7 +58,7 @@ module FilterSetHelper
                       @helper.t("filter_set.submit.export.paging", default: '')
                     end.to_s
 
-      options[:class] += " submit-#{type}-#{format}"
+      options[:_class] += " submit-#{type}-#{format}"
       submit_render type, submit_value, options do
         caption || @helper.t("filter_set.submit.#{type}.caption", _scope: i18n_scope, _format: i18n_format, _paging: i18n_paging)
       end
@@ -72,6 +72,7 @@ module FilterSetHelper
 
     def submit_render type, submit_value, options={}
       options[:value] = submit_value.to_json
+      options[:class] ||= options.delete :_class
       @helper.render layout: "filter_set/submit/#{type}", locals: {options: options} do
         yield.html_safe
       end
