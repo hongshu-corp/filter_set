@@ -153,6 +153,14 @@ describe FilterSetHelper, type: :helper do
       end
     end
 
+    it 'default search button with class' do
+      expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: '').and_return('I18nSearch')
+
+      expect(helper.filter_set{|fs| fs.submit :search, class: 'my-search'}).to have_form(*form_args) do
+        with_tag 'button', with: {type: 'submit', name: 'filter_submit', value: "#{{type: :search}.to_json}", class: 'my-search'}, text: 'I18nSearch'
+      end
+    end
+
     it 'search with scope and default i18n' do
       expect(helper).to receive(:t).with('filter_set.submit.search.scopes.order', default: '').and_return('I18nOrder')
       expect(helper).to receive(:t).with('filter_set.submit.search.caption', _scope: 'I18nOrder').and_return('I18nSearchOrder')

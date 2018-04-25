@@ -72,7 +72,8 @@ module FilterSetHelper
 
     def submit_render type, submit_value, options={}
       options[:value] = submit_value.to_json
-      options[:class] ||= options.delete :_class
+      default_class = options.delete :_class
+      options[:class] ||= default_class
       @helper.render layout: "filter_set/submit/#{type}", locals: {options: options} do
         yield.html_safe
       end
