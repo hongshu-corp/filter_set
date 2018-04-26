@@ -25,24 +25,16 @@ module FilterSetConcern
     obj
   end
 
-  included do
-    #before_action do
-      #if filter_action && filter_action.paging.to_s.downcase != 'true'
-        #params.delete(Rails.configuration.filter_set_page_params)
-      #end
-    #end
+  protected
 
-    def render(options = nil, extra_options = {}, &block)
-      if filter_action && filter_action.type == 'export' && !filter_action.rendered
-        filter_action[:rendered] = true
-        send_data send("export_to_#{filter_action.format}", parse_to_tables(data_for_export(options, extra_options, &block))), type: export_mime_type, filename: export_filename.encode("utf-8")
-      else
-        super options, extra_options, &block
-      end
+  def render(options = nil, extra_options = {}, &block)
+    if filter_action && filter_action.type == 'export' && !filter_action.rendered
+      filter_action[:rendered] = true
+      send_data send("export_to_#{filter_action.format}", parse_to_tables(data_for_export(options, extra_options, &block))), type: export_mime_type, filename: export_filename.encode("utf-8")
+    else
+      super options, extra_options, &block
     end
   end
-
-  protected
 
   def paginate rel
     if filter_action&.type == 'export'
