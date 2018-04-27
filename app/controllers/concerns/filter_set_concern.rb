@@ -25,8 +25,6 @@ module FilterSetConcern
     obj
   end
 
-  protected
-
   def render(options = nil, extra_options = {}, &block)
     if filter_action && filter_action.type == 'export' && !filter_action.rendered
       filter_action[:rendered] = true
@@ -35,6 +33,8 @@ module FilterSetConcern
       super options, extra_options, &block
     end
   end
+
+  protected
 
   def paginate rel
     if filter_action&.type == 'export'
