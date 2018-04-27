@@ -14,17 +14,6 @@ module FilterSetConcern
     @filter_action ||=OpenStruct.new(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
   end
 
-  private
-
-  def build_filter_conditions key
-    obj = OpenStruct.new((params[key] || {}).as_json)
-    obj.to_h.each do |key, value|
-      obj_value = self.try "filter_#{key}_object", value
-      obj["#{key}_object".to_sym] = obj_value if obj_value
-    end
-    obj
-  end
-
   def render(options = nil, extra_options = {}, &block)
     if filter_action && filter_action.type == 'export' && !filter_action.rendered
       filter_action[:rendered] = true
@@ -179,6 +168,15 @@ module FilterSetConcern
       end
     end
     workbook.stream.string
+  end
+
+  def build_filter_conditions key
+    obj = OpenStruct.new((params[key] || {}).as_json)
+    obj.to_h.each do |key, value|
+      obj_value = self.try "filter_#{key}_object", value
+      obj["#{key}_object".to_sym] = obj_value if obj_value
+    end
+    obj
   end
 end
 
