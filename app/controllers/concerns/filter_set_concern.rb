@@ -28,7 +28,7 @@ module FilterSetConcern
   def paginate rel
     if filter_action&.type == 'export'
       if filter_action.paging.to_s.downcase != 'true'
-        rel.define_singleton_method :total_pages {1}
+        rel.define_singleton_method(:total_pages) {1}
         rel
       else
         rel.paginate Rails.configuration.filter_set_page_params.map{|x| [x, params["__#{x}"]]}.to_h
