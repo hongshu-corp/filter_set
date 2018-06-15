@@ -10,6 +10,14 @@ module FilterSetConcern
     @filter_conditions[key]
   end
 
+  def filter_conditions_intended key=nil
+    set = filter_conditions key
+    set.to_h.each do |k, v|
+      set.delete_field k if v.blank?
+    end
+    OpenStruct.new set
+  end
+
   def filter_action
     @filter_action ||=OpenStruct.new(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
   end
