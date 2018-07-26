@@ -8,7 +8,7 @@ RSpec.describe DemoController, type: :controller do
 
       get :index
 
-      expect(assigns(:selected_conditions)).to eq (OpenStruct.new)
+      expect(assigns(:selected_conditions)).to eq ({})
     end
 
     it 'get object by default key in params' do
@@ -16,7 +16,7 @@ RSpec.describe DemoController, type: :controller do
 
       get :index, {filter_conditions: {text: 'Hello'}}
 
-      expect(assigns(:selected_conditions)).to eq (OpenStruct.new(text: 'Hello'))
+      expect(assigns(:selected_conditions)).to eq ({text: 'Hello'})
     end
 
     it 'get object by search params' do
@@ -24,7 +24,7 @@ RSpec.describe DemoController, type: :controller do
 
       get :index, {my_conditions_key: {text: 'Hello'}}
 
-      expect(assigns(:selected_conditions)).to eq (OpenStruct.new(text: 'Hello'))
+      expect(assigns(:selected_conditions)).to eq ({text: 'Hello'})
     end
 
     it 'get object by hook' do

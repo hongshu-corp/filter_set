@@ -179,12 +179,27 @@ module FilterSetConcern
   end
 
   def build_filter_conditions key
-    obj = OpenStruct.new((params[key] || {}).as_json)
-    obj.to_h.each do |key, value|
+    obj = (params[key] || {}).as_json.deep_symbolize_keys
+    obj.to_a.each do |key, value|
       obj_value = self.try "filter_#{key}_object", value
       obj["#{key}_object".to_sym] = obj_value if obj_value
     end
-    obj
+    dot_hash obj
+  end
+
+  private
+
+  def dot_hash hash
+    hash.each do |key, value|
+      hash.define_singleton_method key do
+        value
+      end
+      dot_hash value if value.is_a? Hash
+    end
+    hash.define_singleton_method :method_missing do |m, *args, &block|
+      nil
+    end
+    hash
   end
 end
 
