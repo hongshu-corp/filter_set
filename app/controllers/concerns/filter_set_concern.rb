@@ -12,14 +12,11 @@ module FilterSetConcern
 
   def filter_conditions_intended key=nil
     set = filter_conditions key
-    set.to_h.each do |k, v|
-      set.delete_field k if v.blank?
-    end
-    OpenStruct.new set
+    set.to_a.reject{|_, v| v.blank?}.to_h
   end
 
   def filter_action
-    @filter_action ||=OpenStruct.new(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
+    @filter_action ||= dot_hash(JSON(params[Rails.configuration.filter_set_submit])) if params[Rails.configuration.filter_set_submit]
   end
 
   def render(options = nil, extra_options = {}, &block)
@@ -179,7 +176,7 @@ module FilterSetConcern
   end
 
   def build_filter_conditions key
-    obj = (params[key] || {}).as_json.deep_symbolize_keys
+    obj = (params[key] || {}).as_json
     obj.to_a.each do |key, value|
       obj_value = self.try "filter_#{key}_object", value
       obj["#{key}_object".to_sym] = obj_value if obj_value
@@ -190,14 +187,11 @@ module FilterSetConcern
   private
 
   def dot_hash hash
-    hash.each do |key, value|
-      hash.define_singleton_method key do
-        value
-      end
+    hash.deep_symbolize_keys!.each do |key, value|
       dot_hash value if value.is_a? Hash
     end
     hash.define_singleton_method :method_missing do |m, *args, &block|
-      nil
+      hash[m]
     end
     hash
   end
