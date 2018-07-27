@@ -71,6 +71,8 @@ GEM
       actionmailer (>= 4.0, < 6)
       activesupport (>= 4.0, < 6)
     ffi (1.9.23)
+    font-awesome-rails (4.7.0.4)
+      railties (>= 3.2, < 6.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     i18n (0.9.5)
@@ -189,6 +191,7 @@ DEPENDENCIES
   capybara-rails
   capybara-screenshot
   filter_set!
+  font-awesome-rails
   nokogiri
   rails (~> 4.2.10)
   rspec-html-matchers
@@ -199,4 +202,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.16.1
+   1.16.2

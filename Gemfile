@@ -18,6 +18,7 @@ gem "slim-rails"
 gem "sass-rails"
 gem "nokogiri"
 gem "rubyXL"
+gem "font-awesome-rails"
 
 group :test do
   gem "sqlite3"
