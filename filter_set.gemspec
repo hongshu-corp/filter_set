@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'sass-rails'
   s.add_dependency 'nokogiri'
   s.add_dependency 'rubyXL'
-  s.add_dependency 'font-awesome-sass'
+  s.add_dependency 'font-awesome-rails'
 end

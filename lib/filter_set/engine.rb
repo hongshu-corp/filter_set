@@ -1,3 +1,8 @@
+require 'font-awesome-rails'
+require 'slim-rails'
+require 'nokogiri'
+require 'rubyXL'
+
 module FilterSet
   class Engine < ::Rails::Engine
     config.generators do |g|
