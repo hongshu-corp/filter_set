@@ -4,7 +4,7 @@ PATH
     filter_set (0.0.1)
       font-awesome-rails
       nokogiri
-      rails (~> 4.2.10)
+      rails (>= 4.2.10)
       rubyXL
       sass-rails
       slim-rails
