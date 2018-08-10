@@ -3,13 +3,18 @@ require 'uri'
 
 module FilterSetHelper
   class DefaultFilterBuilder
-    def initialize builder, helper
+    def initialize builder, helper, main_key
       @builder = builder
       @helper = helper 
+      @main_key = main_key
     end
 
     def builder
       @builder
+    end
+
+    def main_key
+      @main_key
     end
 
     def by filter, options={}
@@ -102,7 +107,7 @@ module FilterSetHelper
         end
       end
       concat(key_value_to_hidden('', query_params)) if query_params.size > 0
-      concat(capture(DefaultFilterBuilder.new(f, self), &block)) if block
+      concat(capture(DefaultFilterBuilder.new(f, self, main_key), &block)) if block
     end
   end
 
