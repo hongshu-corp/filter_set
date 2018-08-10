@@ -8,6 +8,10 @@ module FilterSetHelper
       @helper = helper 
     end
 
+    def builder
+      @builder
+    end
+
     def by filter, options={}
       key = options.delete :key
       filter_class = "by-#{filter}"
@@ -19,7 +23,7 @@ module FilterSetHelper
         caption ||= @helper.t("filter_set.by.#{key}", default: nil)
       end
       caption ||= @helper.t("filter_set.by.#{filter}")
-      options[:class] = filter_class
+      options[:class] = (options[:class] ? options[:class]+' ' : '') +  filter_class
       @helper.render "filter_set/by/#{filter}", builder: self, key: (key||filter), caption: caption, caption_class: caption_class, options: options
     end
 
